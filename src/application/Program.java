@@ -1,7 +1,9 @@
 package application;
 
-import entities.DataLocation;
-import entities.NotePayment;
+import entities.CarRental;
+import entities.Vehicle;
+import services.BrazilTaxService;
+import services.RentalService;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -23,17 +25,22 @@ public class Program {
             System.out.print("Car model: ");
             String modelCar = sc.nextLine();
             System.out.print("Pickup (dd/MM/yyyy hh:mm): ");
-            LocalDateTime intialLocation = LocalDateTime.parse(sc.nextLine(), formato);
+            LocalDateTime start = LocalDateTime.parse(sc.nextLine(), formato);
             System.out.print("Return (dd/MM/yyyy hh:mm): ");
-            LocalDateTime returnLocation = LocalDateTime.parse(sc.nextLine(), formato);
-            DataLocation data = new DataLocation(intialLocation, returnLocation, modelCar);
+            LocalDateTime finish = LocalDateTime.parse(sc.nextLine(), formato);
+            CarRental carRental = new CarRental(start, finish, new Vehicle(modelCar));
+
             System.out.print("Enter price per hour: ");
-            double valuePerHour = sc.nextDouble();
+            double pricePerHour = sc.nextDouble();
             System.out.print("Enter price per day: ");
-            double valuePerDay = sc.nextDouble();
-            NotePayment notePayment = new NotePayment(valuePerHour, valuePerDay, data);
+            double pricePerDay = sc.nextDouble();
+
+            RentalService rentalService = new RentalService(pricePerDay, pricePerHour, new BrazilTaxService());
+
+            rentalService.processInvoice(carRental);
+
             System.out.println("INVOICE:");
-            System.out.println(notePayment);
+            System.out.println(carRental.getInvoice());
         } catch (DateTimeParseException e) {
             System.out.println("Data digitada incorretamente.");
         } catch (InputMismatchException e) {
